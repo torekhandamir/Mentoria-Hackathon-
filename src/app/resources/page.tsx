@@ -14,6 +14,24 @@ import { useTranslation } from "@/lib/i18n";
 import { Resource, UserProfile } from "@/lib/types";
 import { calculateMatchScore, getLocal } from "@/lib/utils";
 
+const ECON_PRIORITY_IDS = ["mankiw-principles-6th", "core-econ"] as const;
+
+function prioritizeResources(items: Resource[], priorityIds: readonly string[]) {
+  const priorityMap = new Map(priorityIds.map((id, index) => [id, index]));
+  return [...items].sort((left, right) => {
+    const leftPriority = priorityMap.get(left.id);
+    const rightPriority = priorityMap.get(right.id);
+
+    if (leftPriority !== undefined || rightPriority !== undefined) {
+      if (leftPriority === undefined) return 1;
+      if (rightPriority === undefined) return -1;
+      return leftPriority - rightPriority;
+    }
+
+    return 0;
+  });
+}
+
 export default function ResourcesPage() {
   const { lang, t } = useTranslation();
   const [profile] = useState<UserProfile | null>(() => getLocal<UserProfile | null>("current-user", null));
@@ -50,9 +68,20 @@ export default function ResourcesPage() {
     )
     .sort((a, b) => calculateMatchScore(profile, b) - calculateMatchScore(profile, a));
 
+  const preferredMajor = major === "All" ? profile?.major : major;
+  const prioritizedFiltered =
+    preferredMajor === "economics" ? prioritizeResources(filtered, ECON_PRIORITY_IDS) : filtered;
+
   const sections = {
-    forMajor: filtered.slice(0, 4),
-    books: filtered.filter((item) => ["Book", "PDF", "Notes", "Guide"].includes(item.type)).slice(0, 4),
+    forMajor: prioritizedFiltered.slice(0, 4),
+    books: prioritizeResources(
+      prioritizedFiltered.filter(
+        (item) =>
+          ["Book", "PDF", "Notes", "Guide"].includes(item.type) ||
+          (preferredMajor === "economics" && item.id === "core-econ"),
+      ),
+      ECON_PRIORITY_IDS,
+    ).slice(0, 4),
     practice: filtered.filter((item) => ["Worksheet", "Past Paper", "Checklist"].includes(item.type)).slice(0, 4),
     videos: filtered.filter((item) => item.embedUrl || item.type === "Video").slice(0, 4),
     official: filtered.filter((item) => /official|college board|ielts|bluebook/i.test(item.title)).slice(0, 4),

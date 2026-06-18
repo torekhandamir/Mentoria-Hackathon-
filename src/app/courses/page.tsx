@@ -5,7 +5,7 @@ import ShinyText from "@/components/animations/ShinyText";
 import SplitText from "@/components/animations/SplitText";
 import { MentoriaAssistantPanel } from "@/components/ai/MentoriaAssistantPanel";
 import { CourseRoadmap } from "@/components/courses/CourseRoadmap";
-import { PublicNav } from "@/components/layout/nav";
+import { AppShell, PublicNav } from "@/components/layout/nav";
 import { Badge, Card, CardTitle } from "@/components/ui/card";
 import { courseRoadmaps } from "@/data/courseRoadmaps";
 import { courses as base } from "@/data/courses";
@@ -54,10 +54,8 @@ export default function CoursesPage() {
     [lang],
   );
 
-  return (
-    <div className="min-h-screen bg-[#07111F] text-white">
-      <PublicNav />
-      <main className="mx-auto max-w-7xl px-4 py-10">
+  const content = (
+    <main className="mx-auto max-w-7xl px-4 py-10">
         <ShinyText
           text={copy.badge}
           speed={2.5}
@@ -127,6 +125,16 @@ export default function CoursesPage() {
           </div>
         </div>
       </main>
+  );
+
+  if (profile) {
+    return <AppShell>{content}</AppShell>;
+  }
+
+  return (
+    <div className="min-h-screen bg-[#07111F] text-white">
+      <PublicNav />
+      {content}
     </div>
   );
 }

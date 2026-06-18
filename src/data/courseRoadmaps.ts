@@ -9,7 +9,7 @@ export const courseRoadmaps: Record<string, CourseSection[]> = {
       tab: "Math",
       title: "SECTION 1 - Foundations of Algebra",
       nodes: [
-        { id: "sat-linear-video", title: "Linear Functions - Video", type: "video", description: "Watch the concept walk-through.", externalUrl: "https://www.khanacademy.org/digital-sat", embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ" },
+        { id: "sat-linear-video", title: "Linear Functions - Video", type: "video", description: "Watch the concept walk-through.", externalUrl: "https://youtu.be/1bTkbmHx944?si=dymJX6bUH-b2eEEp", embedUrl: "https://www.youtube.com/embed/1bTkbmHx944" },
         { id: "sat-linear-practice", title: "Linear Functions - Practice Test", type: "practice", description: "Answer original SAT-style questions.", questions: [{ id: "sat-q1", prompt: "A line passes through (0, 3) and (2, 7). What is its slope?", type: "numeric", correctAnswer: "2", explanation: "Slope = rise/run = (7-3)/(2-0)=2.", difficulty: "Beginner", topic: "Linear Functions", sourceLabel: original }] },
         { id: "sat-systems-video", title: "Linear Equations and Systems - Video", type: "video", description: "Review systems and intersections.", externalUrl: "https://bluebook.collegeboard.org/" },
         { id: "sat-systems-practice", title: "Linear Equations and Systems - Practice Test", type: "practice", description: "Solve systems-based practice.", questions: [{ id: "sat-q2", prompt: "What is the solution to x + y = 10 and x - y = 2?", type: "short-answer", correctAnswer: "x=6,y=4", explanation: "Add equations to get 2x=12, then y=4.", difficulty: "Beginner", topic: "Systems", sourceLabel: original }] },
