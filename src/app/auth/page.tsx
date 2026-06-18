@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { PublicNav } from "@/components/layout/nav";
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
@@ -13,7 +13,7 @@ import { setLocal } from "@/lib/utils";
 
 export default function AuthPage() {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { lang, t } = useTranslation();
   const [role, setRole] = useState<Role>("student");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -24,11 +24,27 @@ export default function AuthPage() {
   const [bio, setBio] = useState("");
   const [languages, setLanguages] = useState("English, Russian");
 
+  const copy = useMemo(
+    () =>
+      ({
+        en: { russian: "Russian", kazakh: "Kazakh", newUser: "New User", adminName: "Admin" },
+        ru: { russian: "Русский", kazakh: "Қазақша", newUser: "Новый пользователь", adminName: "Админ" },
+        kk: { russian: "Орысша", kazakh: "Қазақша", newUser: "Жаңа қолданушы", adminName: "Әкімші" },
+      })[lang],
+    [lang],
+  );
+
   const login = (user: UserProfile) => {
     setLocal("current-user", user);
     setLocal("mentoria-lang", user.language || "ru");
     router.push(
-      user.role === "admin" ? "/admin" : user.role === "mentor" ? "/mentor" : user.major ? "/dashboard" : "/onboarding",
+      user.role === "admin"
+        ? "/admin"
+        : user.role === "mentor"
+          ? "/mentor"
+          : user.major
+            ? "/dashboard"
+            : "/onboarding",
     );
   };
 
@@ -67,9 +83,9 @@ export default function AuthPage() {
                 </Select>
                 <Input value={country} onChange={(event) => setCountry(event.target.value)} placeholder={t("country")} />
                 <Select value={language} onChange={(event) => setLanguage(event.target.value as UserProfile["language"])}>
-                  <option value="ru">Русский</option>
+                  <option value="ru">{copy.russian}</option>
                   <option value="en">English</option>
-                  <option value="kk">Қазақша</option>
+                  <option value="kk">{copy.kazakh}</option>
                 </Select>
               </>
             )}
@@ -87,7 +103,7 @@ export default function AuthPage() {
               onClick={() =>
                 login({
                   id: crypto.randomUUID(),
-                  name: name || "New User",
+                  name: name || copy.newUser,
                   email: email || "new@mentoria.demo",
                   role,
                   grade: role === "student" ? grade : undefined,
@@ -95,7 +111,8 @@ export default function AuthPage() {
                   language,
                   expertise: role === "mentor" ? expertise : undefined,
                   bio: role === "mentor" ? bio : undefined,
-                  languages: role === "mentor" ? languages.split(",").map((item) => item.trim()) : undefined,
+                  languages:
+                    role === "mentor" ? languages.split(",").map((item) => item.trim()) : undefined,
                   interests: [],
                   goals: [],
                 })
@@ -116,7 +133,7 @@ export default function AuthPage() {
                 onClick={() =>
                   login({
                     id: "admin-demo",
-                    name: "Demo Admin",
+                    name: copy.adminName,
                     email: "admin@mentoria.demo",
                     role: "admin",
                     interests: [],

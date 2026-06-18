@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/layout/nav";
-import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useTranslation } from "@/lib/i18n";
 import { UserProfile } from "@/lib/types";
@@ -36,17 +36,26 @@ const templates: Record<string, string[]> = {
 };
 
 export default function RoadmapPage() {
-  const { t } = useTranslation();
+  const { lang, t } = useTranslation();
   const [profile] = useState<UserProfile | null>(() => getLocal("current-user", null));
   const [done, setDone] = useState<string[]>(() => getLocal("roadmap-done", []));
   const tasks = templates[profile?.major || ""] || templates.economics;
+  const copy = useMemo(
+    () =>
+      ({
+        en: { plan: "plan" },
+        ru: { plan: "план" },
+        kk: { plan: "жоспар" },
+      })[lang],
+    [lang],
+  );
 
   return (
     <AppShell>
       <h1 className="display text-4xl font-black uppercase">{t("roadmapTitle")}</h1>
       <Card className="mt-6">
         <CardTitle>
-          {profile?.grade || "10"} grade · {profile?.major || "economics"} plan
+          {profile?.grade || "10"} · {profile?.major || "economics"} {copy.plan}
         </CardTitle>
         <div className="mt-4">
           <Progress value={(done.length / tasks.length) * 100} />

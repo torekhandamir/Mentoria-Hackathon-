@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge, Card, CardTitle } from "@/components/ui/card";
@@ -15,8 +16,17 @@ export function OpportunityCard({
   item: Opportunity;
   profile: UserProfile | null;
 }) {
-  const { t } = useTranslation();
+  const { lang, t } = useTranslation();
   const score = calculateMatchScore(profile, item);
+  const copy = useMemo(
+    () =>
+      ({
+        en: { grades: "Grades", whyFit: "major, tags and grade fit your profile." },
+        ru: { grades: "Классы", whyFit: "направление, теги и класс подходят вашему профилю." },
+        kk: { grades: "Сыныптар", whyFit: "бағыт, тегтер және сынып профиліңізге сәйкес келеді." },
+      })[lang],
+    [lang],
+  );
 
   return (
     <Card className="flex h-full flex-col gap-4">
@@ -46,10 +56,10 @@ export function OpportunityCard({
           {t("deadline")}: {item.deadlineLabel || item.deadline || t("checkOfficialWebsite")}
         </span>
         <span>
-          {item.format} · Grades {item.gradeRange} · {item.difficulty}
+          {item.format} · {copy.grades} {item.gradeRange} · {item.difficulty}
         </span>
         <span className="text-[#94CFDB]">
-          {t("whyMatchesYou")}: {item.whyUseful || "major, tags and grade fit your profile."}
+          {t("whyMatchesYou")}: {item.whyUseful || copy.whyFit}
         </span>
       </div>
       <div className="flex flex-wrap gap-2">
@@ -87,10 +97,31 @@ export function CourseCard({
   course: Course;
   profile: UserProfile | null;
 }) {
-  const { t } = useTranslation();
+  const { lang, t } = useTranslation();
   const completed = getLocal<string[]>("completed-lessons", []);
   const total = course.lessons.length;
   const done = course.lessons.filter((lesson) => completed.includes(lesson.id)).length;
+  const copy = useMemo(
+    () =>
+      ({
+        en: {
+          lessonFlow: "Activity: video · reading · flashcards · quiz · practice task",
+          lessonComplete: "Lesson complete",
+          certificate: "Course completion unlocked",
+        },
+        ru: {
+          lessonFlow: "Формат: видео · чтение · флешкарты · квиз · практика",
+          lessonComplete: "Урок завершен",
+          certificate: "Открыто завершение курса",
+        },
+        kk: {
+          lessonFlow: "Формат: видео · оқу · флешкарталар · квиз · практика",
+          lessonComplete: "Сабақ аяқталды",
+          certificate: "Курс аяқталуы ашылды",
+        },
+      })[lang],
+    [lang],
+  );
 
   return (
     <Card className="space-y-4">
@@ -131,9 +162,7 @@ export function CourseCard({
               <div>
                 <b className="text-white">{lesson.title}</b>
                 <p className="text-xs text-slate-400">{lesson.description}</p>
-                <p className="mt-2 text-xs text-slate-300">
-                  Activity: video · reading · flashcards · quiz · practice task
-                </p>
+                <p className="mt-2 text-xs text-slate-300">{copy.lessonFlow}</p>
               </div>
               <Button
                 variant={completed.includes(lesson.id) ? "secondary" : "default"}
@@ -143,7 +172,7 @@ export function CourseCard({
                     Array.from(new Set([...getLocal<string[]>("completed-lessons", []), lesson.id])),
                   );
                   setLocal("student-xp", getLocal<number>("student-xp", 0) + 25);
-                  toast.success("Lesson complete +25 XP");
+                  toast.success(`${copy.lessonComplete} +25 XP`);
                   location.reload();
                 }}
               >
@@ -153,7 +182,7 @@ export function CourseCard({
           </div>
         ))}
       </div>
-      {done === total && <Badge>Certificate placeholder unlocked</Badge>}
+      {done === total && <Badge>{copy.certificate}</Badge>}
     </Card>
   );
 }

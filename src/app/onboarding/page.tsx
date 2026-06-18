@@ -1,14 +1,14 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import SplitText from "@/components/animations/SplitText";
-import { Button } from "@/components/ui/button";
 import { Badge, Card, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { courses } from "@/data/courses";
-import { interests, goals, majors } from "@/data/majors";
+import { goals, interests, majors } from "@/data/majors";
 import { opportunities } from "@/data/opportunities";
 import { resources } from "@/data/resources";
 import { useTranslation } from "@/lib/i18n";
@@ -17,7 +17,7 @@ import { calculateMatchScore, getLocal, setLocal } from "@/lib/utils";
 
 export default function Onboarding() {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { lang, t } = useTranslation();
   const [step, setStep] = useState(1);
   const [profile, setProfile] = useState<UserProfile>(() =>
     getLocal<UserProfile>("current-user", {
@@ -32,6 +32,34 @@ export default function Onboarding() {
       interests: [],
       goals: [],
     }),
+  );
+
+  const copy = useMemo(
+    () =>
+      ({
+        en: {
+          russian: "Russian",
+          kazakh: "Kazakh",
+          other: "Other",
+          summary:
+            "Profile: {major}. In your first 30 days, focus on one lesson, one saved opportunity, one resource pack and one portfolio update.",
+        },
+        ru: {
+          russian: "Русский",
+          kazakh: "Қазақша",
+          other: "Другая страна",
+          summary:
+            "Профиль: {major}. В первые 30 дней сфокусируйтесь на одном уроке, одной сохраненной возможности, одном наборе ресурсов и одном обновлении портфолио.",
+        },
+        kk: {
+          russian: "Орысша",
+          kazakh: "Қазақша",
+          other: "Басқа ел",
+          summary:
+            "Профиль: {major}. Алғашқы 30 күнде бір сабаққа, бір сақталған мүмкіндікке, бір ресурс жинағына және бір портфолио жаңартуына назар аударыңыз.",
+        },
+      })[lang],
+    [lang],
   );
 
   const toggle = (key: "interests" | "goals", value: string) =>
@@ -78,9 +106,7 @@ export default function Onboarding() {
               />
               <Select
                 value={profile.grade}
-                onChange={(event) =>
-                  setProfile({ ...profile, grade: event.target.value as UserProfile["grade"] })
-                }
+                onChange={(event) => setProfile({ ...profile, grade: event.target.value as UserProfile["grade"] })}
               >
                 {["8", "9", "10", "11", "12", "Gap Year"].map((grade) => (
                   <option key={grade} value={grade}>
@@ -93,7 +119,7 @@ export default function Onboarding() {
                 onChange={(event) => setProfile({ ...profile, country: event.target.value })}
               >
                 <option>Kazakhstan</option>
-                <option>Other</option>
+                <option>{copy.other}</option>
               </Select>
               <Select
                 value={profile.language}
@@ -101,9 +127,9 @@ export default function Onboarding() {
                   setProfile({ ...profile, language: event.target.value as UserProfile["language"] })
                 }
               >
-                <option value="ru">Русский</option>
+                <option value="ru">{copy.russian}</option>
                 <option value="en">English</option>
-                <option value="kk">Қазақша</option>
+                <option value="kk">{copy.kazakh}</option>
               </Select>
             </div>
           )}
@@ -133,8 +159,10 @@ export default function Onboarding() {
             <div className="space-y-5">
               <CardTitle>{t("generatedProfile")}</CardTitle>
               <p className="text-slate-300">
-                Major: {majors.find((major) => major.id === profile.major)?.title}. Your first 30 days focus on
-                one lesson, one saved opportunity, one resource pack and one portfolio update.
+                {copy.summary.replace(
+                  "{major}",
+                  majors.find((major) => major.id === profile.major)?.title || profile.major || "economics",
+                )}
               </p>
               <Preview
                 title={t("recommendedCourses")}
@@ -192,6 +220,7 @@ function Grid({
       {items.map((item) => (
         <button
           key={item}
+          type="button"
           onClick={() => onPick(item)}
           className={`rounded-2xl border p-4 text-left text-sm font-bold transition ${
             selected.includes(item)

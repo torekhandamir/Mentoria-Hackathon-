@@ -6,7 +6,13 @@ import { mockUsers } from "@/data/mockUsers";
 import { useTranslation } from "@/lib/i18n";
 
 export default function AdminUsersPage() {
-  const { t } = useTranslation();
+  const { lang, t } = useTranslation();
+  const copy =
+    lang === "ru"
+      ? { grade: "Класс", progress: "прогресс" }
+      : lang === "kk"
+        ? { grade: "Сынып", progress: "прогресс" }
+        : { grade: "Grade", progress: "progress" };
 
   return (
     <AppShell admin>
@@ -16,7 +22,8 @@ export default function AdminUsersPage() {
           <Card key={user.id}>
             <CardTitle>{user.name}</CardTitle>
             <p className="mt-2 text-slate-400">
-              {user.email} · Grade {user.grade} · {user.major} · progress {user.id === "student-demo" ? "38%" : "24%"}
+              {user.email} · {copy.grade} {user.grade} · {user.major} · {copy.progress}{" "}
+              {user.id === "student-demo" ? "38%" : "24%"}
             </p>
           </Card>
         ))}

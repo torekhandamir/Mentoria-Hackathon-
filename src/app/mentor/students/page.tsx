@@ -6,7 +6,13 @@ import { mockUsers } from "@/data/mockUsers";
 import { useTranslation } from "@/lib/i18n";
 
 export default function MentorStudentsPage() {
-  const { t } = useTranslation();
+  const { lang, t } = useTranslation();
+  const copy =
+    lang === "ru"
+      ? { grade: "Класс", progress: "недавний прогресс: активен на этой неделе" }
+      : lang === "kk"
+        ? { grade: "Сынып", progress: "соңғы прогресс: осы аптада белсенді" }
+        : { grade: "Grade", progress: "recent progress: active this week" };
 
   return (
     <AppShell mentor>
@@ -16,7 +22,7 @@ export default function MentorStudentsPage() {
           <Card key={user.id}>
             <CardTitle>{user.name}</CardTitle>
             <p className="mt-2 text-slate-400">
-              Grade {user.grade} · {user.major} · recent progress: active this week
+              {copy.grade} {user.grade} · {user.major} · {copy.progress}
             </p>
           </Card>
         ))}

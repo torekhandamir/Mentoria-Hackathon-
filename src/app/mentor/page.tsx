@@ -13,8 +13,14 @@ import { UserProfile } from "@/lib/types";
 import { getLocal } from "@/lib/utils";
 
 export default function MentorDashboard() {
-  const { t } = useTranslation();
+  const { lang, t } = useTranslation();
   const [mentor] = useState<UserProfile>(() => getLocal<UserProfile>("current-user", demoMentor));
+  const activityLine =
+    lang === "ru"
+      ? "завершил учебную активность"
+      : lang === "kk"
+        ? "оқу белсенділігін аяқтады"
+        : "completed a learning activity";
 
   return (
     <AppShell mentor>
@@ -45,7 +51,7 @@ export default function MentorDashboard() {
         <CardTitle>{t("recentStudentProgress")}</CardTitle>
         <div className="mt-4 space-y-2 text-sm text-slate-300">
           {mockUsers.map((user) => (
-            <p key={user.id}>{user.name}: completed a learning activity</p>
+            <p key={user.id}>{user.name}: {activityLine}</p>
           ))}
         </div>
       </Card>

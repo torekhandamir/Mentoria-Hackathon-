@@ -14,7 +14,7 @@ import { Opportunity, UserProfile } from "@/lib/types";
 import { calculateMatchScore, getLocal, urgency } from "@/lib/utils";
 
 export default function OpportunitiesPage() {
-  const { t } = useTranslation();
+  const { lang, t } = useTranslation();
   const [profile] = useState<UserProfile | null>(() => getLocal<UserProfile | null>("current-user", null));
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
@@ -23,6 +23,39 @@ export default function OpportunitiesPage() {
   const [difficulty, setDifficulty] = useState("All");
   const [deadline, setDeadline] = useState("All");
   const [items] = useState<Opportunity[]>(() => [...base, ...getLocal<Opportunity[]>("admin-opportunities", [])]);
+  const copy =
+    lang === "ru"
+      ? {
+          subtitle: "Возможности Mentoria",
+          all: "Все",
+          online: "Онлайн",
+          offline: "Офлайн",
+          hybrid: "Гибрид",
+          urgent: "Срочно",
+          soon: "Скоро",
+          later: "Позже",
+        }
+      : lang === "kk"
+        ? {
+            subtitle: "Mentoria мүмкіндіктері",
+            all: "Барлығы",
+            online: "Онлайн",
+            offline: "Офлайн",
+            hybrid: "Гибрид",
+            urgent: "Шұғыл",
+            soon: "Жақында",
+            later: "Кейін",
+          }
+        : {
+            subtitle: "Mentoria opportunities",
+            all: "All",
+            online: "Online",
+            offline: "Offline",
+            hybrid: "Hybrid",
+            urgent: "Urgent",
+            soon: "Soon",
+            later: "Later",
+          };
 
   const filtered = useMemo(
     () =>
@@ -49,7 +82,7 @@ export default function OpportunitiesPage() {
       <PublicNav />
       <main className="mx-auto max-w-7xl px-4 py-10">
         <ShinyText
-          text="Mentoria opportunities"
+          text={copy.subtitle}
           speed={2.5}
           color="#86BCDE"
           shineColor="#F8FAFC"
@@ -71,13 +104,13 @@ export default function OpportunitiesPage() {
         <div className="mt-8 grid gap-3 md:grid-cols-6">
           <Input placeholder={t("search")} value={query} onChange={(event) => setQuery(event.target.value)} />
           <Select value={category} onChange={(event) => setCategory(event.target.value)}>
-            <option>All</option>
+            <option value="All">{copy.all}</option>
             {Array.from(new Set(items.map((item) => item.category))).map((item) => (
               <option key={item}>{item}</option>
             ))}
           </Select>
           <Select value={major} onChange={(event) => setMajor(event.target.value)}>
-            <option>All</option>
+            <option value="All">{copy.all}</option>
             {majors.map((item) => (
               <option key={item.id} value={item.id}>
                 {item.title}
@@ -85,22 +118,22 @@ export default function OpportunitiesPage() {
             ))}
           </Select>
           <Select value={format} onChange={(event) => setFormat(event.target.value)}>
-            <option>All</option>
+            <option value="All">{copy.all}</option>
             <option>Online</option>
             <option>Offline</option>
             <option>Hybrid</option>
           </Select>
           <Select value={difficulty} onChange={(event) => setDifficulty(event.target.value)}>
-            <option>All</option>
+            <option value="All">{copy.all}</option>
             <option>Beginner</option>
             <option>Intermediate</option>
             <option>Advanced</option>
           </Select>
           <Select value={deadline} onChange={(event) => setDeadline(event.target.value)}>
-            <option>All</option>
-            <option value="urgent">Urgent</option>
-            <option value="soon">Soon</option>
-            <option value="later">Later</option>
+            <option value="All">{copy.all}</option>
+            <option value="urgent">{copy.urgent}</option>
+            <option value="soon">{copy.soon}</option>
+            <option value="later">{copy.later}</option>
           </Select>
         </div>
 

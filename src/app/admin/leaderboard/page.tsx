@@ -10,15 +10,76 @@ import { useTranslation } from "@/lib/i18n";
 import { getLocal } from "@/lib/utils";
 
 export default function LeaderboardPage() {
-  const { t } = useTranslation();
+  const { lang, t } = useTranslation();
   const [major, setMajor] = useState("All");
   const [grade, setGrade] = useState("All");
   const [period, setPeriod] = useState("All time");
   const current = getLocal("current-user", null) as { name?: string; grade?: string; major?: string } | null;
+  const copy = useMemo(
+    () =>
+      ({
+        en: {
+          all: "All",
+          today: "Today",
+          week: "Week",
+          month: "Month",
+          allTime: "All time",
+          days: "days",
+          major: "Major",
+          streak: "Streak",
+          tasks: "Tasks",
+          saved: "Saved",
+          topMajor: "Economics",
+          topCourse: "Introduction to Economics",
+        },
+        ru: {
+          all: "Все",
+          today: "Сегодня",
+          week: "Неделя",
+          month: "Месяц",
+          allTime: "Все время",
+          days: "дней",
+          major: "Направление",
+          streak: "Стрик",
+          tasks: "Задачи",
+          saved: "Сохранено",
+          topMajor: "Economics",
+          topCourse: "Introduction to Economics",
+        },
+        kk: {
+          all: "Барлығы",
+          today: "Бүгін",
+          week: "Апта",
+          month: "Ай",
+          allTime: "Барлық уақыт",
+          days: "күн",
+          major: "Бағыт",
+          streak: "Стрик",
+          tasks: "Тапсырмалар",
+          saved: "Сақталған",
+          topMajor: "Economics",
+          topCourse: "Introduction to Economics",
+        },
+      })[lang],
+    [lang],
+  );
 
   const rows = useMemo(
     () =>
-      [...mockUsers, ...(current?.name ? [{ ...mockUsers[0], id: "current-local", name: current.name, grade: current.grade || "10", major: current.major || "economics" }] : [])]
+      [
+        ...mockUsers,
+        ...(current?.name
+          ? [
+              {
+                ...mockUsers[0],
+                id: "current-local",
+                name: current.name,
+                grade: current.grade || "10",
+                major: current.major || "economics",
+              },
+            ]
+          : []),
+      ]
         .filter((user) => major === "All" || user.major === major)
         .filter((user) => grade === "All" || user.grade === grade)
         .map((user, index) => ({
@@ -46,21 +107,23 @@ export default function LeaderboardPage() {
         </Card>
         <Card>
           <CardTitle>{t("highestStreak")}</CardTitle>
-          <p className="mt-2 text-[#94CFDB]">{rows[0]?.streak} days</p>
+          <p className="mt-2 text-[#94CFDB]">
+            {rows[0]?.streak} {copy.days}
+          </p>
         </Card>
         <Card>
           <CardTitle>{t("mostActiveMajor")}</CardTitle>
-          <p className="mt-2 text-[#94CFDB]">{major === "All" ? "Economics" : major}</p>
+          <p className="mt-2 text-[#94CFDB]">{major === "All" ? copy.topMajor : major}</p>
         </Card>
         <Card>
           <CardTitle>{t("mostCompletedCourse")}</CardTitle>
-          <p className="mt-2 text-[#94CFDB]">Introduction to Economics</p>
+          <p className="mt-2 text-[#94CFDB]">{copy.topCourse}</p>
         </Card>
       </div>
 
       <div className="mt-6 grid gap-3 md:grid-cols-3">
         <Select value={major} onChange={(event) => setMajor(event.target.value)}>
-          <option>All</option>
+          <option value="All">{copy.all}</option>
           {majors.map((item) => (
             <option key={item.id} value={item.id}>
               {item.title}
@@ -68,7 +131,7 @@ export default function LeaderboardPage() {
           ))}
         </Select>
         <Select value={grade} onChange={(event) => setGrade(event.target.value)}>
-          <option>All</option>
+          <option value="All">{copy.all}</option>
           {["8", "9", "10", "11", "12", "Gap Year"].map((item) => (
             <option key={item} value={item}>
               {item}
@@ -76,10 +139,10 @@ export default function LeaderboardPage() {
           ))}
         </Select>
         <Select value={period} onChange={(event) => setPeriod(event.target.value)}>
-          <option>Today</option>
-          <option>Week</option>
-          <option>Month</option>
-          <option>All time</option>
+          <option>{copy.today}</option>
+          <option>{copy.week}</option>
+          <option>{copy.month}</option>
+          <option>{copy.allTime}</option>
         </Select>
       </div>
 
@@ -87,7 +150,19 @@ export default function LeaderboardPage() {
         <table className="w-full min-w-[980px] text-left text-sm">
           <thead className="bg-[#07111F] text-slate-300">
             <tr>
-              {[t("rank"), t("studentRole"), t("grade"), "Major", "XP", "Streak", t("questions"), t("averageScore"), "Tasks", "Saved", t("progress")].map((heading) => (
+              {[
+                t("rank"),
+                t("studentRole"),
+                t("grade"),
+                copy.major,
+                "XP",
+                copy.streak,
+                t("questions"),
+                t("averageScore"),
+                copy.tasks,
+                copy.saved,
+                t("progress"),
+              ].map((heading) => (
                 <th key={heading} className="p-3">
                   {heading}
                 </th>

@@ -6,8 +6,8 @@ import { toast } from "sonner";
 import ShinyText from "@/components/animations/ShinyText";
 import { MentoriaAssistantPanel } from "@/components/ai/MentoriaAssistantPanel";
 import { AppShell } from "@/components/layout/nav";
-import { Button } from "@/components/ui/button";
 import { Badge, Card, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { activities } from "@/data/activities";
 import { courses } from "@/data/courses";
@@ -26,7 +26,7 @@ import {
 } from "@/lib/utils";
 
 export default function Dashboard() {
-  const { t } = useTranslation();
+  const { lang, t } = useTranslation();
   const [profile] = useState<UserProfile | null>(() => getLocal<UserProfile | null>("current-user", null));
   const [savedOpps] = useState<string[]>(() => getLocal("saved-opportunities", []));
   const [savedResources] = useState<string[]>(() => getLocal("saved-resources", []));
@@ -35,11 +35,64 @@ export default function Dashboard() {
   const [xp, setXp] = useState<number>(() => getLocal("student-xp", 0));
   const [streak, setStreak] = useState<number>(() => getLocal("student-streak", 0));
 
+  const copy = useMemo(
+    () =>
+      ({
+        en: {
+          fallbackName: "student",
+          nextOpportunity: "Your next opportunity is waiting.",
+          chooseMajor: "Choose major",
+          dayStreak: "day streak",
+          completedLabel: "completed",
+          xpTotal: "XP total",
+          tasksCompleted: "tasks completed",
+          dailyTaskToast: "Daily task complete",
+          practiceRecommendation: "SAT Math and Economics drills",
+          weakTopics: ["Linear Functions", "Elasticity"],
+          weekdays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+          trackerIntro: "Saved opportunities, deadline review and portfolio tasks appear here.",
+        },
+        ru: {
+          fallbackName: "студент",
+          nextOpportunity: "Следующая возможность уже ждет вас.",
+          chooseMajor: "Выберите направление",
+          dayStreak: "дней стрика",
+          completedLabel: "выполнено",
+          xpTotal: "XP всего",
+          tasksCompleted: "задач выполнено",
+          dailyTaskToast: "Задача дня выполнена",
+          practiceRecommendation: "SAT Math и задачи по экономике",
+          weakTopics: ["Линейные функции", "Эластичность"],
+          weekdays: ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"],
+          trackerIntro: "Здесь отображаются сохраненные возможности, дедлайны и задачи по портфолио.",
+        },
+        kk: {
+          fallbackName: "студент",
+          nextOpportunity: "Келесі мүмкіндік сізді күтіп тұр.",
+          chooseMajor: "Бағыт таңдаңыз",
+          dayStreak: "күндік стрик",
+          completedLabel: "аяқталды",
+          xpTotal: "XP барлығы",
+          tasksCompleted: "тапсырма орындалды",
+          dailyTaskToast: "Күндік тапсырма орындалды",
+          practiceRecommendation: "SAT Math және экономика тапсырмалары",
+          weakTopics: ["Сызықтық функциялар", "Икемділік"],
+          weekdays: ["Дс", "Сс", "Ср", "Бс", "Жм", "Сб", "Жс"],
+          trackerIntro: "Мұнда сақталған мүмкіндіктер, дедлайндар және портфолио тапсырмалары көрсетіледі.",
+        },
+      })[lang],
+    [lang],
+  );
+
   const feed = getLocal<{ title: string; date: string; xp: number }[]>("activity-feed", []);
   const allResources = [...resources, ...externalResources];
-  const dailyTasks = activities.filter((activity) => !profile?.major || activity.majorTargets.includes(profile.major)).slice(0, 5);
+  const dailyTasks = activities
+    .filter((activity) => !profile?.major || activity.majorTargets.includes(profile.major))
+    .slice(0, 5);
   const dailyPercent = dailyTasks.length
-    ? Math.round((dailyTasks.filter((activity) => doneActivities.includes(activity.id)).length / dailyTasks.length) * 100)
+    ? Math.round(
+        (dailyTasks.filter((activity) => doneActivities.includes(activity.id)).length / dailyTasks.length) * 100,
+      )
     : 0;
   const recommendedOpps = [...opportunities]
     .sort((a, b) => calculateMatchScore(profile, b) - calculateMatchScore(profile, a))
@@ -56,7 +109,7 @@ export default function Dashboard() {
       setDoneActivities(getLocal("completed-activities", []));
       setXp(getLocal("student-xp", 0));
       setStreak(getLocal("student-streak", 0));
-      toast.success(`Daily task complete +${task.xp} XP`);
+      toast.success(`${copy.dailyTaskToast} +${task.xp} XP`);
     }
   };
 
@@ -65,20 +118,26 @@ export default function Dashboard() {
       <h1 className="display text-4xl font-black uppercase">{t("dashboardTitle")}</h1>
       <Card className="mt-6">
         <ShinyText
-          text={`${t("welcomeBackTitle")}, ${profile?.name || "student"}`}
+          text={`${t("welcomeBackTitle")}, ${profile?.name || copy.fallbackName}`}
           speed={2.5}
           color="#86BCDE"
           shineColor="#F8FAFC"
           className="text-sm font-semibold uppercase tracking-[0.2em]"
         />
         <CardTitle className="mt-3">
-          {profile?.name || "Student"}. Your next opportunity is waiting.
+          {profile?.name || copy.fallbackName}. {copy.nextOpportunity}
         </CardTitle>
         <div className="mt-3 flex flex-wrap gap-2">
-          <Badge>{t("grade")} {profile?.grade || "10"}</Badge>
-          <Badge>{majors.find((major) => major.id === profile?.major)?.title || "Choose major"}</Badge>
+          <Badge>
+            {t("grade")} {profile?.grade || "10"}
+          </Badge>
+          <Badge>
+            {majors.find((major) => major.id === profile?.major)?.title || copy.chooseMajor}
+          </Badge>
           <Badge>{levelFromXp(xp)}</Badge>
-          <Badge>{streak}-day streak</Badge>
+          <Badge>
+            {streak} {copy.dayStreak}
+          </Badge>
         </div>
       </Card>
 
@@ -97,10 +156,18 @@ export default function Dashboard() {
             <Progress value={dailyPercent} />
           </div>
           <div className="mt-4 grid grid-cols-2 gap-3 text-sm text-slate-300">
-            <span>{dailyPercent}% completed</span>
-            <span>{xp} XP total</span>
-            <span>{streak}-day streak</span>
-            <span>{doneActivities.length} tasks completed</span>
+            <span>
+              {dailyPercent}% {copy.completedLabel}
+            </span>
+            <span>
+              {xp} {copy.xpTotal}
+            </span>
+            <span>
+              {streak} {copy.dayStreak}
+            </span>
+            <span>
+              {doneActivities.length} {copy.tasksCompleted}
+            </span>
           </div>
         </Card>
         <Card>
@@ -171,15 +238,22 @@ export default function Dashboard() {
         <Card>
           <CardTitle>{t("practiceStats")}</CardTitle>
           <div className="mt-4 space-y-2 text-sm text-slate-300">
-            <p>{t("questionsAnsweredToday")}: {practiceSummary.answeredToday || practiceSummary.totalAnswered}</p>
-            <p>{t("averageScore")}: {practiceSummary.averageScore}%</p>
-            <p>{t("recommendedNextPractice")}: SAT Math and Economics drills</p>
+            <p>
+              {t("questionsAnsweredToday")}:{" "}
+              {practiceSummary.answeredToday || practiceSummary.totalAnswered}
+            </p>
+            <p>
+              {t("averageScore")}: {practiceSummary.averageScore}%
+            </p>
+            <p>
+              {t("recommendedNextPractice")}: {copy.practiceRecommendation}
+            </p>
           </div>
         </Card>
         <Card>
           <CardTitle>{t("weakTopics")}</CardTitle>
           <div className="mt-4 flex flex-wrap gap-2">
-            {(practiceSummary.weakTopics.length ? practiceSummary.weakTopics : ["Linear Functions", "Elasticity"]).map((topic) => (
+            {(practiceSummary.weakTopics.length ? practiceSummary.weakTopics : copy.weakTopics).map((topic) => (
               <Badge key={topic}>{topic}</Badge>
             ))}
           </div>
@@ -222,7 +296,7 @@ export default function Dashboard() {
         <Card>
           <CardTitle>{t("weeklyProgress")}</CardTitle>
           <div className="mt-4 grid grid-cols-7 gap-2 text-center text-xs">
-            {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, index) => (
+            {copy.weekdays.map((day, index) => (
               <div key={day} className="rounded-xl border border-[#324E60] p-2">
                 <b>{day}</b>
                 <p className="mt-2 text-[#94CFDB]">{Math.max(0, doneActivities.length - index)}</p>
@@ -236,9 +310,7 @@ export default function Dashboard() {
         <MentoriaAssistantPanel />
         <Card>
           <CardTitle>{t("applicationTracker")}</CardTitle>
-          <p className="mt-3 text-sm text-slate-400">
-            Saved opportunities, deadline review and portfolio tasks appear here for demo tracking.
-          </p>
+          <p className="mt-3 text-sm text-slate-400">{copy.trackerIntro}</p>
           <div className="mt-4 space-y-2 text-sm">
             {opportunities
               .filter((opportunity) => savedOpps.includes(opportunity.id))

@@ -14,8 +14,38 @@ const econ: [string, string, Resource["type"], string][] = [
 ];
 
 export const resources: Resource[] = [
+  {
+    id: "cfa-quant-2025",
+    title: "CFA Level 1 Quantitative Methods 2025",
+    type: "PDF",
+    subject: "Economics / Finance",
+    majorTargets: ["economics", "finance", "business"],
+    tags: ["Finance", "Quantitative Methods", "Exam Prep"],
+    level: "Intermediate",
+    language: "English",
+    description: "Uploaded quantitative methods study file for economics and finance preparation.",
+    fileUrl: "/resources/cfa-quant-2025.pdf",
+    isDownloadable: true,
+    estimatedReadingTime: "PDF",
+    createdAt: "2026-06-18",
+  },
+  {
+    id: "itf-level-1-question-bank",
+    title: "ITF Level I Question Bank",
+    type: "PDF",
+    subject: "Economics / Finance",
+    majorTargets: ["economics", "finance", "business"],
+    tags: ["Finance", "Question Bank", "Practice"],
+    level: "Intermediate",
+    language: "English",
+    description: "Uploaded question bank for economics and finance-focused independent practice.",
+    fileUrl: "/resources/itf-level-1-question-bank.pdf",
+    isDownloadable: true,
+    estimatedReadingTime: "Question Bank",
+    createdAt: "2026-06-18",
+  },
   ...econ.map(([id, title, type, subject], i) => ({
-    id, title, type, subject, majorTargets: ["economics", "finance", "business"], tags: ["Economics", "Finance", "Business", i > 6 ? "Olympiads" : "Portfolio Building"], level: i < 4 ? "Beginner" : "Intermediate", language: i % 3 === 0 ? "Russian" : "English", description: "Generated sample learning resource metadata for Mentoria Hub demos. Placeholder file only.", fileUrl: `/resources/${id}.pdf`, isDownloadable: true, estimatedReadingTime: `${20 + i * 5} min`, createdAt: `2026-06-${10 + i}`
+    id, title, type, subject, majorTargets: ["economics", "finance", "business"], tags: ["Economics", "Finance", "Business", i > 6 ? "Olympiads" : "Portfolio Building"], level: i < 4 ? "Beginner" : "Intermediate", language: i % 3 === 0 ? "Russian" : "English", description: "Mentoria study resource for economics, finance and business preparation.", fileUrl: `/resources/${id}.pdf`, isDownloadable: true, estimatedReadingTime: `${20 + i * 5} min`, createdAt: `2026-06-${10 + i}`
   } as Resource)),
   { id: "sat-formulas", title: "SAT Math Formula Sheet", type: "Checklist", subject: "SAT Math", majorTargets: ["admissions", "mathematics"], tags: ["SAT", "STEM"], level: "Beginner", language: "English", description: "Core formulas and mistake patterns for SAT Math.", fileUrl: "/resources/sat-formulas.pdf", isDownloadable: true, estimatedReadingTime: "25 min", createdAt: "2026-06-15" },
   { id: "ielts-writing", title: "IELTS Writing Task 2 Planner", type: "Worksheet", subject: "IELTS", majorTargets: ["admissions", "humanities"], tags: ["IELTS", "English"], level: "Beginner", language: "English", description: "Template for argument structure and vocabulary practice.", fileUrl: "/resources/ielts-writing.pdf", isDownloadable: true, estimatedReadingTime: "30 min", createdAt: "2026-06-14" },

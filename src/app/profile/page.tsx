@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/layout/nav";
-import { Button } from "@/components/ui/button";
 import { Badge, Card, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/input";
 import { majors } from "@/data/majors";
 import { useTranslation } from "@/lib/i18n";
@@ -12,9 +12,42 @@ import { UserProfile } from "@/lib/types";
 import { getLocal, levelFromXp, setLocal } from "@/lib/utils";
 
 export default function ProfilePage() {
-  const { t } = useTranslation();
+  const { lang, t } = useTranslation();
   const [profile, setProfile] = useState<UserProfile | null>(() => getLocal("current-user", null));
   const xp = getLocal<number>("student-xp", 0);
+  const copy = useMemo(
+    () =>
+      ({
+        en: {
+          fallbackName: "Student",
+          russian: "Russian",
+          kazakh: "Kazakh",
+          dayStreak: "day streak",
+          lessons: "lessons",
+          savedOpportunities: "saved opportunities",
+          savedResources: "saved resources",
+        },
+        ru: {
+          fallbackName: "Студент",
+          russian: "Русский",
+          kazakh: "Қазақша",
+          dayStreak: "дней стрика",
+          lessons: "уроков",
+          savedOpportunities: "сохраненных возможностей",
+          savedResources: "сохраненных ресурсов",
+        },
+        kk: {
+          fallbackName: "Студент",
+          russian: "Орысша",
+          kazakh: "Қазақша",
+          dayStreak: "күндік стрик",
+          lessons: "сабақ",
+          savedOpportunities: "сақталған мүмкіндіктер",
+          savedResources: "сақталған ресурстар",
+        },
+      })[lang],
+    [lang],
+  );
 
   const save = () => {
     if (!profile) return;
@@ -27,18 +60,22 @@ export default function ProfilePage() {
     <AppShell>
       <h1 className="display text-4xl font-black uppercase">{t("profileTitle")}</h1>
       <Card className="mt-6">
-        <CardTitle>{profile?.name || "Student"}</CardTitle>
+        <CardTitle>{profile?.name || copy.fallbackName}</CardTitle>
         <p className="mt-2 text-slate-400">{profile?.email}</p>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <Input
             value={profile?.name || ""}
-            onChange={(event) => setProfile((current) => (current ? { ...current, name: event.target.value } : current))}
+            onChange={(event) =>
+              setProfile((current) => (current ? { ...current, name: event.target.value } : current))
+            }
             placeholder={t("fullName")}
           />
           <Select
             value={profile?.grade || "10"}
             onChange={(event) =>
-              setProfile((current) => (current ? { ...current, grade: event.target.value as UserProfile["grade"] } : current))
+              setProfile((current) =>
+                current ? { ...current, grade: event.target.value as UserProfile["grade"] } : current,
+              )
             }
           >
             {["8", "9", "10", "11", "12", "Gap Year"].map((grade) => (
@@ -49,7 +86,9 @@ export default function ProfilePage() {
           </Select>
           <Select
             value={profile?.major || "economics"}
-            onChange={(event) => setProfile((current) => (current ? { ...current, major: event.target.value } : current))}
+            onChange={(event) =>
+              setProfile((current) => (current ? { ...current, major: event.target.value } : current))
+            }
           >
             {majors.map((major) => (
               <option key={major.id} value={major.id}>
@@ -60,12 +99,14 @@ export default function ProfilePage() {
           <Select
             value={profile?.language || "ru"}
             onChange={(event) =>
-              setProfile((current) => (current ? { ...current, language: event.target.value as UserProfile["language"] } : current))
+              setProfile((current) =>
+                current ? { ...current, language: event.target.value as UserProfile["language"] } : current,
+              )
             }
           >
-            <option value="ru">Русский</option>
+            <option value="ru">{copy.russian}</option>
             <option value="en">English</option>
-            <option value="kk">Қазақша</option>
+            <option value="kk">{copy.kazakh}</option>
           </Select>
         </div>
         <Button className="mt-4" onClick={save}>
@@ -75,10 +116,18 @@ export default function ProfilePage() {
           <Badge>{profile?.role}</Badge>
           <Badge>{levelFromXp(xp)}</Badge>
           <Badge>{xp} XP</Badge>
-          <Badge>{getLocal<number>("student-streak", 0)}-day streak</Badge>
-          <Badge>{getLocal<string[]>("completed-lessons", []).length} lessons</Badge>
-          <Badge>{getLocal<string[]>("saved-opportunities", []).length} saved opportunities</Badge>
-          <Badge>{getLocal<string[]>("saved-resources", []).length} saved resources</Badge>
+          <Badge>
+            {getLocal<number>("student-streak", 0)} {copy.dayStreak}
+          </Badge>
+          <Badge>
+            {getLocal<string[]>("completed-lessons", []).length} {copy.lessons}
+          </Badge>
+          <Badge>
+            {getLocal<string[]>("saved-opportunities", []).length} {copy.savedOpportunities}
+          </Badge>
+          <Badge>
+            {getLocal<string[]>("saved-resources", []).length} {copy.savedResources}
+          </Badge>
         </div>
         <h3 className="mt-6 font-black">{t("interests")}</h3>
         <div className="mt-2 flex flex-wrap gap-2">

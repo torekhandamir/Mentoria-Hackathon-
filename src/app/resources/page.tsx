@@ -15,7 +15,7 @@ import { Resource, UserProfile } from "@/lib/types";
 import { calculateMatchScore, getLocal } from "@/lib/utils";
 
 export default function ResourcesPage() {
-  const { t } = useTranslation();
+  const { lang, t } = useTranslation();
   const [profile] = useState<UserProfile | null>(() => getLocal<UserProfile | null>("current-user", null));
   const [items] = useState<Resource[]>(() => [
     ...base,
@@ -28,6 +28,12 @@ export default function ResourcesPage() {
   const [type, setType] = useState("All");
   const [language, setLanguage] = useState("All");
   const savedResources = getLocal<string[]>("saved-resources", []);
+  const copy =
+    lang === "ru"
+      ? { all: "Все", searchResources: "Искать ресурсы" }
+      : lang === "kk"
+        ? { all: "Барлығы", searchResources: "Ресурстарды іздеу" }
+        : { all: "All", searchResources: "Search resources" };
 
   const filtered = items
     .filter(
@@ -76,12 +82,12 @@ export default function ResourcesPage() {
 
         <div className="mt-8 grid gap-3 md:grid-cols-5">
           <Input
-            placeholder={`${t("search")} resources`}
+            placeholder={copy.searchResources}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
           />
           <Select value={major} onChange={(event) => setMajor(event.target.value)}>
-            <option>All</option>
+            <option value="All">{copy.all}</option>
             {majors.map((item) => (
               <option key={item.id} value={item.id}>
                 {item.title}
@@ -89,19 +95,19 @@ export default function ResourcesPage() {
             ))}
           </Select>
           <Select value={subject} onChange={(event) => setSubject(event.target.value)}>
-            <option>All</option>
+            <option value="All">{copy.all}</option>
             {Array.from(new Set(items.map((item) => item.subject))).map((item) => (
               <option key={item}>{item}</option>
             ))}
           </Select>
           <Select value={type} onChange={(event) => setType(event.target.value)}>
-            <option>All</option>
+            <option value="All">{copy.all}</option>
             {Array.from(new Set(items.map((item) => item.type))).map((item) => (
               <option key={item}>{item}</option>
             ))}
           </Select>
           <Select value={language} onChange={(event) => setLanguage(event.target.value)}>
-            <option>All</option>
+            <option value="All">{copy.all}</option>
             {Array.from(new Set(items.map((item) => item.language))).map((item) => (
               <option key={item}>{item}</option>
             ))}

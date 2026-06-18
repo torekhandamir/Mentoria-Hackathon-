@@ -12,7 +12,13 @@ import { resources } from "@/data/resources";
 import { useTranslation } from "@/lib/i18n";
 
 export default function AdminPage() {
-  const { t } = useTranslation();
+  const { lang, t } = useTranslation();
+  const overview =
+    lang === "ru"
+      ? "Популярные направления: Economics, Computer Science, Admissions. Самая сохраняемая категория: Business Competition."
+      : lang === "kk"
+        ? "Танымал бағыттар: Economics, Computer Science, Admissions. Ең көп сақталатын санат: Business Competition."
+        : "Popular majors: Economics, Computer Science, Admissions. Highest saved category: Business Competition.";
 
   return (
     <AppShell admin>
@@ -42,9 +48,7 @@ export default function AdminPage() {
         </Card>
         <Card>
           <CardTitle>{t("operationalOverview")}</CardTitle>
-          <p className="mt-3 text-slate-300">
-            Popular majors: Economics, Computer Science, Admissions. Highest saved category: Business Competition.
-          </p>
+          <p className="mt-3 text-slate-300">{overview}</p>
         </Card>
       </div>
     </AppShell>

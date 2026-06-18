@@ -4,8 +4,8 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import SplitText from "@/components/animations/SplitText";
 import { AppShell } from "@/components/layout/nav";
-import { Button } from "@/components/ui/button";
 import { Badge, Card, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/input";
 import { activities } from "@/data/activities";
 import { majors } from "@/data/majors";
@@ -14,13 +14,44 @@ import { UserProfile } from "@/lib/types";
 import { getLocal, recordActivity } from "@/lib/utils";
 
 export default function ActivitiesPage() {
-  const { t } = useTranslation();
+  const { lang, t } = useTranslation();
   const [profile] = useState<UserProfile | null>(() => getLocal("current-user", null));
   const [major, setMajor] = useState(profile?.major || "All");
   const [type, setType] = useState("All");
   const [timeRequired, setTimeRequired] = useState("All");
   const [status, setStatus] = useState("All");
   const [done, setDone] = useState<string[]>(() => getLocal("completed-activities", []));
+
+  const copy = useMemo(
+    () =>
+      ({
+        en: {
+          all: "All",
+          open: "Open",
+          completed: "Completed",
+          completedToast: "Completed",
+          alreadyCompleted: "Already completed",
+          recommendedPath: "recommended for your current learning path.",
+        },
+        ru: {
+          all: "Все",
+          open: "Открыто",
+          completed: "Завершено",
+          completedToast: "Выполнено",
+          alreadyCompleted: "Уже выполнено",
+          recommendedPath: "рекомендуется для вашего текущего трека обучения.",
+        },
+        kk: {
+          all: "Барлығы",
+          open: "Ашық",
+          completed: "Аяқталды",
+          completedToast: "Орындалды",
+          alreadyCompleted: "Бұрын аяқталған",
+          recommendedPath: "ағымдағы оқу жолыңызға ұсынылады.",
+        },
+      })[lang],
+    [lang],
+  );
 
   const filtered = useMemo(
     () =>
@@ -43,9 +74,9 @@ export default function ActivitiesPage() {
     if (!activity) return;
     if (recordActivity(activity)) {
       setDone(getLocal("completed-activities", []));
-      toast.success(`Completed +${activity.xp} XP`);
+      toast.success(`${copy.completedToast} +${activity.xp} XP`);
     } else {
-      toast.info("Already completed");
+      toast.info(copy.alreadyCompleted);
     }
   };
 
@@ -66,7 +97,7 @@ export default function ActivitiesPage() {
 
       <div className="mt-6 grid gap-3 md:grid-cols-4">
         <Select value={major} onChange={(event) => setMajor(event.target.value)}>
-          <option>All</option>
+          <option value="All">{copy.all}</option>
           {majors.map((item) => (
             <option key={item.id} value={item.id}>
               {item.title}
@@ -74,21 +105,21 @@ export default function ActivitiesPage() {
           ))}
         </Select>
         <Select value={type} onChange={(event) => setType(event.target.value)}>
-          <option>All</option>
+          <option value="All">{copy.all}</option>
           {Array.from(new Set(activities.map((activity) => activity.type))).map((item) => (
             <option key={item}>{item}</option>
           ))}
         </Select>
         <Select value={timeRequired} onChange={(event) => setTimeRequired(event.target.value)}>
-          <option>All</option>
+          <option value="All">{copy.all}</option>
           <option>10 min</option>
           <option>20 min</option>
           <option>30+ min</option>
         </Select>
         <Select value={status} onChange={(event) => setStatus(event.target.value)}>
-          <option>All</option>
-          <option>Open</option>
-          <option>Completed</option>
+          <option value="All">{copy.all}</option>
+          <option value="Open">{copy.open}</option>
+          <option value="Completed">{copy.completed}</option>
         </Select>
       </div>
 
@@ -110,7 +141,7 @@ export default function ActivitiesPage() {
                 <b className="text-[#94CFDB]">+{activity.xp} XP</b>
               </div>
               <p className="mt-3 text-sm text-slate-400">
-                {activity.category} · recommended for your current learning path.
+                {activity.category} · {copy.recommendedPath}
               </p>
               <div className="mt-4 flex gap-2">
                 <Button variant={isDone ? "secondary" : "default"} onClick={() => complete(activity.id)}>
