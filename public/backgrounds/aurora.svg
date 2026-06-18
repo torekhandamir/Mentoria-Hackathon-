@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#5E95CB"/><stop offset=".55" stop-color="#93CFDB"/><stop offset="1" stop-color="#62A3AD"/></linearGradient><filter id="b"><feGaussianBlur stdDeviation="60"/></filter></defs>
+  <rect width="1600" height="900" fill="#07111F"/>
+  <path filter="url(#b)" opacity=".45" fill="url(#g)" d="M-70 391C141 197 323 162 508 286s293 285 489 190 397-291 684-146v389H-70z"/>
+</svg>
