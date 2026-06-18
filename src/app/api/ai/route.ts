@@ -1,36 +1,107 @@
-import { buildAssistantReply } from "@/lib/assistant";
-import { UserProfile } from "@/lib/types";
+type AssistantRequestBody = {
+  message?: string;
+  messages?: { role: "user" | "assistant"; content: string }[];
+  profile?: Record<string, unknown> | null;
+};
+
+type AssistantApiPayload =
+  | {
+      reply?: string;
+      message?: string;
+      content?: string;
+      answer?: string;
+      output_text?: string;
+      choices?: Array<{ message?: { content?: string } }>;
+      output?: Array<{ content?: Array<{ text?: string }> }>;
+    }
+  | string
+  | null;
+
+function extractReply(payload: AssistantApiPayload) {
+  if (!payload) return "";
+  if (typeof payload === "string") return payload;
+
+  if (typeof payload.reply === "string" && payload.reply) return payload.reply;
+  if (typeof payload.message === "string" && payload.message) return payload.message;
+  if (typeof payload.content === "string" && payload.content) return payload.content;
+  if (typeof payload.answer === "string" && payload.answer) return payload.answer;
+  if (typeof payload.output_text === "string" && payload.output_text) return payload.output_text;
+
+  const choiceText = payload.choices?.[0]?.message?.content;
+  if (typeof choiceText === "string" && choiceText) return choiceText;
+
+  const outputText = payload.output?.[0]?.content?.map((item) => item.text).filter(Boolean).join("\n");
+  if (outputText) return outputText;
+
+  return "";
+}
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as {
-      message?: string;
-      messages?: { role: "user" | "assistant"; content: string }[];
-      profile?: Partial<UserProfile> | null;
-    };
-
+    const body = (await request.json()) as AssistantRequestBody;
     const message = body.message?.trim();
+
     if (!message) {
       return Response.json(
-        { reply: "\u041f\u043e\u0436\u0430\u043b\u0443\u0439\u0441\u0442\u0430, \u043d\u0430\u043f\u0438\u0448\u0438\u0442\u0435 \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u0435." },
+        { reply: "Пожалуйста, напишите сообщение." },
         { status: 400 },
       );
     }
 
-    const reply = buildAssistantReply({
-      message,
-      messages: body.messages,
-      profile: body.profile,
+    const upstreamUrl =
+      process.env.MENTORIA_ASSISTANT_API_URL ||
+      process.env.ASSISTANT_API_URL ||
+      process.env.NEXT_PUBLIC_ASSISTANT_API_URL;
+
+    if (!upstreamUrl) {
+      return Response.json(
+        { reply: "Ассистент временно недоступен. Попробуйте позже." },
+        { status: 503 },
+      );
+    }
+
+    const upstreamToken =
+      process.env.MENTORIA_ASSISTANT_API_KEY ||
+      process.env.ASSISTANT_API_KEY ||
+      process.env.OPENAI_API_KEY ||
+      process.env.OPENROUTER_API_KEY;
+
+    const upstreamResponse = await fetch(upstreamUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(upstreamToken ? { Authorization: `Bearer ${upstreamToken}` } : {}),
+      },
+      body: JSON.stringify(body),
+      cache: "no-store",
     });
+
+    let data: AssistantApiPayload = null;
+    try {
+      data = (await upstreamResponse.json()) as AssistantApiPayload;
+    } catch {
+      data = null;
+    }
+
+    const reply = extractReply(data);
+
+    if (!upstreamResponse.ok || !reply) {
+      console.error("Assistant upstream error:", {
+        status: upstreamResponse.status,
+        statusText: upstreamResponse.statusText,
+      });
+
+      return Response.json(
+        { reply: "Ассистент временно недоступен. Попробуйте позже." },
+        { status: upstreamResponse.ok ? 502 : upstreamResponse.status },
+      );
+    }
 
     return Response.json({ reply });
   } catch (error) {
     console.error("Assistant route error:", error);
     return Response.json(
-      {
-        reply:
-          "\u0410\u0441\u0441\u0438\u0441\u0442\u0435\u043d\u0442 \u0432\u0440\u0435\u043c\u0435\u043d\u043d\u043e \u043d\u0435\u0434\u043e\u0441\u0442\u0443\u043f\u0435\u043d. \u041f\u043e\u043f\u0440\u043e\u0431\u0443\u0439\u0442\u0435 \u043f\u043e\u0437\u0436\u0435.",
-      },
+      { reply: "Ассистент временно недоступен. Попробуйте позже." },
       { status: 500 },
     );
   }

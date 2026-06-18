@@ -4,7 +4,7 @@ import { useState } from "react";
 import SplitText from "@/components/animations/SplitText";
 import { MentoriaAssistantPanel } from "@/components/ai/MentoriaAssistantPanel";
 import { ResourceCard } from "@/components/features/cards";
-import { PublicNav } from "@/components/layout/nav";
+import { AppShell, PublicNav } from "@/components/layout/nav";
 import { CardTitle } from "@/components/ui/card";
 import { Input, Select } from "@/components/ui/input";
 import { externalResources } from "@/data/externalResources";
@@ -63,75 +63,83 @@ export default function ResourcesPage() {
     saved: filtered.filter((item) => savedResources.includes(item.id)).slice(0, 4),
   };
 
+  const content = (
+    <>
+      <SplitText
+        tag="h1"
+        text={t("resourcesTitle")}
+        splitType="words"
+        delay={70}
+        duration={0.8}
+        from={{ opacity: 0, y: 30 }}
+        to={{ opacity: 1, y: 0 }}
+        className="display text-5xl font-black uppercase"
+        textAlign="left"
+      />
+      <p className="mt-3 text-slate-300">{t("resourcesIntro")}</p>
+
+      <div className="mt-8 grid gap-3 md:grid-cols-5">
+        <Input
+          placeholder={copy.searchResources}
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+        />
+        <Select value={major} onChange={(event) => setMajor(event.target.value)}>
+          <option value="All">{copy.all}</option>
+          {majors.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.title}
+            </option>
+          ))}
+        </Select>
+        <Select value={subject} onChange={(event) => setSubject(event.target.value)}>
+          <option value="All">{copy.all}</option>
+          {Array.from(new Set(items.map((item) => item.subject))).map((item) => (
+            <option key={item}>{item}</option>
+          ))}
+        </Select>
+        <Select value={type} onChange={(event) => setType(event.target.value)}>
+          <option value="All">{copy.all}</option>
+          {Array.from(new Set(items.map((item) => item.type))).map((item) => (
+            <option key={item}>{item}</option>
+          ))}
+        </Select>
+        <Select value={language} onChange={(event) => setLanguage(event.target.value)}>
+          <option value="All">{copy.all}</option>
+          {Array.from(new Set(items.map((item) => item.language))).map((item) => (
+            <option key={item}>{item}</option>
+          ))}
+        </Select>
+      </div>
+
+      <div className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_.9fr]">
+        <div className="space-y-10">
+          <Section title={t("forYourMajor")} items={sections.forMajor} profile={profile} />
+          <Section title={t("booksAndFiles")} items={sections.books} profile={profile} />
+          <Section title={t("practiceBanks")} items={sections.practice} profile={profile} />
+          <Section title={t("videoPlaylists")} items={sections.videos} profile={profile} />
+          <Section title={t("officialTests")} items={sections.official} profile={profile} />
+          <Section title={t("essayGuides")} items={sections.essays} profile={profile} />
+          <Section title={t("researchPrograms")} items={sections.research} profile={profile} />
+          <Section title={t("socialResources")} items={sections.social} profile={profile} />
+          <Section title={t("recentlyAdded")} items={sections.recent} profile={profile} />
+          <Section title={t("savedResourcesLabel")} items={sections.saved} profile={profile} />
+        </div>
+        <div>
+          <MentoriaAssistantPanel />
+        </div>
+      </div>
+    </>
+  );
+
+  if (profile) {
+    return <AppShell>{content}</AppShell>;
+  }
+
   return (
     <div className="min-h-screen bg-[#0F1621] text-white">
       <PublicNav />
-      <main className="mx-auto max-w-7xl px-4 py-10">
-        <SplitText
-          tag="h1"
-          text={t("resourcesTitle")}
-          splitType="words"
-          delay={70}
-          duration={0.8}
-          from={{ opacity: 0, y: 30 }}
-          to={{ opacity: 1, y: 0 }}
-          className="display text-5xl font-black uppercase"
-          textAlign="left"
-        />
-        <p className="mt-3 text-slate-300">{t("resourcesIntro")}</p>
-
-        <div className="mt-8 grid gap-3 md:grid-cols-5">
-          <Input
-            placeholder={copy.searchResources}
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
-          <Select value={major} onChange={(event) => setMajor(event.target.value)}>
-            <option value="All">{copy.all}</option>
-            {majors.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.title}
-              </option>
-            ))}
-          </Select>
-          <Select value={subject} onChange={(event) => setSubject(event.target.value)}>
-            <option value="All">{copy.all}</option>
-            {Array.from(new Set(items.map((item) => item.subject))).map((item) => (
-              <option key={item}>{item}</option>
-            ))}
-          </Select>
-          <Select value={type} onChange={(event) => setType(event.target.value)}>
-            <option value="All">{copy.all}</option>
-            {Array.from(new Set(items.map((item) => item.type))).map((item) => (
-              <option key={item}>{item}</option>
-            ))}
-          </Select>
-          <Select value={language} onChange={(event) => setLanguage(event.target.value)}>
-            <option value="All">{copy.all}</option>
-            {Array.from(new Set(items.map((item) => item.language))).map((item) => (
-              <option key={item}>{item}</option>
-            ))}
-          </Select>
-        </div>
-
-        <div className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_.9fr]">
-          <div className="space-y-10">
-            <Section title={t("forYourMajor")} items={sections.forMajor} profile={profile} />
-            <Section title={t("booksAndFiles")} items={sections.books} profile={profile} />
-            <Section title={t("practiceBanks")} items={sections.practice} profile={profile} />
-            <Section title={t("videoPlaylists")} items={sections.videos} profile={profile} />
-            <Section title={t("officialTests")} items={sections.official} profile={profile} />
-            <Section title={t("essayGuides")} items={sections.essays} profile={profile} />
-            <Section title={t("researchPrograms")} items={sections.research} profile={profile} />
-            <Section title={t("socialResources")} items={sections.social} profile={profile} />
-            <Section title={t("recentlyAdded")} items={sections.recent} profile={profile} />
-            <Section title={t("savedResourcesLabel")} items={sections.saved} profile={profile} />
-          </div>
-          <div>
-            <MentoriaAssistantPanel />
-          </div>
-        </div>
-      </main>
+      <main className="mx-auto max-w-7xl px-4 py-10">{content}</main>
     </div>
   );
 }

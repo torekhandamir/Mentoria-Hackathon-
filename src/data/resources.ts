@@ -1,13 +1,7 @@
 import { Resource } from "@/lib/types";
 
 const econ: [string, string, Resource["type"], string][] = [
-  ["economics-notes", "Economics Fundamentals Notes", "Notes", "Economics"],
-  ["micro-elasticity", "Microeconomics: Supply, Demand & Elasticity", "PDF", "Microeconomics"],
-  ["macro-basics", "Macroeconomics: GDP, Inflation & Unemployment", "Guide", "Macroeconomics"],
   ["market-structures", "Market Structures Practice Pack", "Worksheet", "Economics"],
-  ["game-theory", "Game Theory Basics", "Book", "Economics"],
-  ["finance-starter", "Finance & Investment Starter Guide", "Guide", "Finance"],
-  ["cfa-econ", "CFA Level 1 Economics Overview", "PDF", "Finance"],
   ["econ-olympiad-set", "Economics Olympiad Problem Set", "Past Paper", "Economics"],
   ["business-frameworks", "Business Case Frameworks", "Checklist", "Business"],
   ["behavioral-econ", "Behavioral Economics Reading Pack", "Link", "Economics"],
