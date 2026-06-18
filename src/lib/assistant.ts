@@ -1,0 +1,113 @@
+import { UserProfile } from "@/lib/types";
+
+export type AssistantChatMessage = {
+  role: "user" | "assistant";
+  content: string;
+};
+
+type AssistantRequest = {
+  message: string;
+  messages?: AssistantChatMessage[];
+  profile?: Partial<UserProfile> | null;
+};
+
+function hasAny(text: string, keywords: string[]) {
+  return keywords.some((keyword) => text.includes(keyword));
+}
+
+export function buildAssistantReply({ message, profile }: AssistantRequest) {
+  const normalized = message.trim().toLowerCase();
+  const major = profile?.major || "";
+  const interests = (profile?.interests || []).join(", ");
+
+  if (!normalized) {
+    return "\u041f\u043e\u0436\u0430\u043b\u0443\u0439\u0441\u0442\u0430, \u043d\u0430\u043f\u0438\u0448\u0438\u0442\u0435 \u0432\u043e\u043f\u0440\u043e\u0441, \u0438 \u044f \u043f\u043e\u043c\u043e\u0433\u0443 \u0441 \u0432\u043e\u0437\u043c\u043e\u0436\u043d\u043e\u0441\u0442\u044f\u043c\u0438, \u043a\u0443\u0440\u0441\u0430\u043c\u0438 \u0438\u043b\u0438 \u0440\u0435\u0441\u0443\u0440\u0441\u0430\u043c\u0438.";
+  }
+
+  if (
+    hasAny(normalized, [
+      "\u044d\u043a\u043e\u043d\u043e\u043c",
+      "econ",
+      "finance",
+      "\u0431\u0438\u0437\u043d\u0435\u0441",
+      "business",
+    ])
+  ) {
+    return [
+      "\u0414\u043b\u044f \u043d\u0430\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u044f Economics \u044f \u0431\u044b \u043d\u0430\u0447\u0430\u043b \u0441 \u0442\u0440\u0435\u0445 \u0448\u0430\u0433\u043e\u0432:",
+      "1. \u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u0435 International Economics Olympiad \u0438 LaunchX \u0432 \u0432\u043e\u0437\u043c\u043e\u0436\u043d\u043e\u0441\u0442\u044f\u0445.",
+      "2. \u041e\u0442\u043a\u0440\u043e\u0439\u0442\u0435 OpenStax Principles of Economics \u0438 Mentoria Economics Fundamentals Notes \u0432 \u0440\u0435\u0441\u0443\u0440\u0441\u0430\u0445.",
+      "3. \u041f\u0440\u043e\u0439\u0434\u0438\u0442\u0435 Introduction to Economics \u0438\u043b\u0438 Finance & Investment Basics, \u0447\u0442\u043e\u0431\u044b \u0437\u0430\u043a\u0440\u0435\u043f\u0438\u0442\u044c \u0442\u0435\u043e\u0440\u0438\u044e \u043f\u0440\u0430\u043a\u0442\u0438\u043a\u043e\u0439.",
+      "\u0415\u0441\u043b\u0438 \u0445\u043e\u0442\u0438\u0442\u0435, \u0434\u0430\u043b\u044c\u0448\u0435 \u043c\u043e\u0433\u0443 \u0441\u0443\u0437\u0438\u0442\u044c \u0440\u0435\u043a\u043e\u043c\u0435\u043d\u0434\u0430\u0446\u0438\u0438 \u043f\u043e\u0434 \u043e\u043b\u0438\u043c\u043f\u0438\u0430\u0434\u044b, research programs \u0438\u043b\u0438 internships.",
+    ].join("\n");
+  }
+
+  if (
+    hasAny(normalized, [
+      "sat",
+      "ielts",
+      "admission",
+      "essay",
+      "\u044d\u0441\u0441\u0435",
+      "\u043f\u043e\u0441\u0442\u0443\u043f",
+    ])
+  ) {
+    return [
+      "\u0414\u043b\u044f admissions-\u0442\u0440\u0435\u043a\u0430 \u0440\u0435\u043a\u043e\u043c\u0435\u043d\u0434\u0443\u044e \u0442\u0430\u043a\u043e\u0439 \u043d\u0430\u0431\u043e\u0440:",
+      "- College Board SAT Practice Tests \u0438 Bluebook \u0434\u043b\u044f \u043e\u0444\u0438\u0446\u0438\u0430\u043b\u044c\u043d\u043e\u0439 SAT \u043f\u0440\u0430\u043a\u0442\u0438\u043a\u0438.",
+      "- British Council IELTS Free Practice Tests \u0434\u043b\u044f \u0430\u043d\u0433\u043b\u0438\u0439\u0441\u043a\u043e\u0433\u043e.",
+      "- College Essay Guy \u0438 Mentoria University Application Checklist \u0434\u043b\u044f \u044d\u0441\u0441\u0435 \u0438 \u0434\u0435\u0434\u043b\u0430\u0439\u043d\u043e\u0432.",
+      "\u041d\u0430\u0447\u043d\u0438\u0442\u0435 \u0441 \u043e\u0434\u043d\u043e\u0433\u043e \u043e\u0444\u0438\u0446\u0438\u0430\u043b\u044c\u043d\u043e\u0433\u043e \u0442\u0435\u0441\u0442\u0430, \u0437\u0430\u0442\u0435\u043c \u0434\u043e\u0431\u0430\u0432\u044c\u0442\u0435 checklist \u0438 2-3 weekly tasks \u0432 roadmap.",
+    ].join("\n");
+  }
+
+  if (
+    hasAny(normalized, [
+      "intern",
+      "\u0441\u0442\u0430\u0436",
+      "research",
+      "\u0438\u0441\u0441\u043b\u0435\u0434",
+      "summer",
+    ])
+  ) {
+    return [
+      "\u0414\u043b\u044f research \u0438 internship \u043f\u043e\u0438\u0441\u043a\u0430 \u043f\u043e\u0441\u043c\u043e\u0442\u0440\u0438\u0442\u0435:",
+      "- Lumiere Education",
+      "- Polygence",
+      "- Pioneer Academics",
+      "- StandOut Search",
+      "- LaunchX \u0434\u043b\u044f entrepreneurship track",
+      "\u0421\u043d\u0430\u0447\u0430\u043b\u0430 \u0432\u044b\u0431\u0435\u0440\u0438\u0442\u0435 1 \u043f\u0440\u043e\u0433\u0440\u0430\u043c\u043c\u0443 \u043f\u043e \u043f\u0440\u043e\u0444\u0438\u043b\u044e, \u0437\u0430\u0442\u0435\u043c \u0441\u0440\u0430\u0432\u043d\u0438\u0442\u0435 \u0442\u0440\u0435\u0431\u043e\u0432\u0430\u043d\u0438\u044f, \u0434\u0435\u0434\u043b\u0430\u0439\u043d\u044b \u0438 expected output.",
+    ].join("\n");
+  }
+
+  if (hasAny(normalized, ["computer science", "cs", "programming", "python", "ai"])) {
+    return [
+      "\u0414\u043b\u044f CS/AI \u0442\u0440\u0435\u043a\u0430 \u0445\u043e\u0440\u043e\u0448\u0438\u0435 \u0441\u0442\u0430\u0440\u0442\u043e\u0432\u044b\u0435 \u043c\u0430\u0442\u0435\u0440\u0438\u0430\u043b\u044b:",
+      "- CS50x",
+      "- CS50's Introduction to Programming with Python",
+      "- CS50's Introduction to Artificial Intelligence with Python",
+      "- International Olympiad in Informatics, \u0435\u0441\u043b\u0438 \u043d\u0443\u0436\u0435\u043d competition track.",
+      "\u041b\u0443\u0447\u0448\u0438\u0439 \u043f\u043e\u0440\u044f\u0434\u043e\u043a: CS50x -> Python -> AI -> project or olympiad practice.",
+    ].join("\n");
+  }
+
+  if (hasAny(normalized, ["biology", "chemistry", "physics", "medicine", "bio", "chem", "phys"])) {
+    return [
+      "\u0414\u043b\u044f STEM / pre-med \u0442\u0440\u0435\u043a\u0430 \u043e\u0442\u043a\u0440\u043e\u0439\u0442\u0435 \u0440\u0435\u0441\u0443\u0440\u0441\u044b \u043f\u043e major:",
+      "- OpenStax Biology 2e",
+      "- OpenStax Chemistry 2e",
+      "- OpenStax College Physics for AP Courses 2e",
+      "\u0410 \u0438\u0437 \u0432\u043e\u0437\u043c\u043e\u0436\u043d\u043e\u0441\u0442\u0435\u0439 \u0441\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u0435 IBO, IChO, IPhO, Regeneron ISEF \u0438\u043b\u0438 research programs.",
+    ].join("\n");
+  }
+
+  return [
+    "\u042f \u043c\u043e\u0433\u0443 \u043f\u043e\u043c\u043e\u0447\u044c \u0441 \u0432\u043e\u0437\u043c\u043e\u0436\u043d\u043e\u0441\u0442\u044f\u043c\u0438, \u043a\u0443\u0440\u0441\u0430\u043c\u0438, \u0440\u0435\u0441\u0443\u0440\u0441\u0430\u043c\u0438 \u0438 roadmap.",
+    `\u0422\u0435\u043a\u0443\u0449\u0438\u0439 major: ${major || "\u043d\u0435 \u0432\u044b\u0431\u0440\u0430\u043d"}.`,
+    interests
+      ? `\u0418\u043d\u0442\u0435\u0440\u0435\u0441\u044b \u0438\u0437 \u043f\u0440\u043e\u0444\u0438\u043b\u044f: ${interests}.`
+      : "\u0414\u043e\u0431\u0430\u0432\u044c\u0442\u0435 \u0438\u043d\u0442\u0435\u0440\u0435\u0441\u044b \u0432 \u043f\u0440\u043e\u0444\u0438\u043b\u044c, \u0447\u0442\u043e\u0431\u044b \u0440\u0435\u043a\u043e\u043c\u0435\u043d\u0434\u0430\u0446\u0438\u0438 \u0441\u0442\u0430\u043b\u0438 \u0442\u043e\u0447\u043d\u0435\u0435.",
+    "\u041f\u043e\u043f\u0440\u043e\u0431\u0443\u0439\u0442\u0435 \u0441\u043f\u0440\u043e\u0441\u0438\u0442\u044c \u043f\u0440\u043e economics, SAT, research programs, internships \u0438\u043b\u0438 course plan.",
+  ].join("\n");
+}
